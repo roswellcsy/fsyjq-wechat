@@ -1,0 +1,55 @@
+{
+    "button": [{
+            "name": "政策相关",
+            "sub_button": [{
+                    "type": "view",
+                    "name": "政策信息",
+                    "url": "http://fsyjq.roswellcsy.com/policy"
+                },
+                {
+                    "type": "view",
+                    "name": "自助申报",
+                    "url": "http://zjsb.fslgb.gov.cn/wx/main#/sd-home"
+                },
+                {
+                    "type": "view",
+                    "name": "政策解答",
+                    "url": "http://fsyjq.roswellcsy.com/message"
+                }
+            ]
+        },
+        {
+            "name": "公益服务",
+            "sub_button": [{
+                    "type": "view",
+                    "name": "公益活动",
+                    "url": "http://fsyjq.roswellcsy.com/charity_campaign"
+                },
+                {
+                    "type": "view",
+                    "name": "专业服务",
+                    "url": "http://fsyjq.roswellcsy.com/professional_service"
+                },
+                {
+                    "type": "view",
+                    "name": "志愿服务",
+                    "url": "http://fsyjq.roswellcsy.com/volunteer_service"
+                }
+            ]
+        },
+        {
+            "name": "共享平台",
+            "sub_button": [{
+                    "type": "view",
+                    "name": "服务拼团",
+                    "url": "http://fsyjq.roswellcsy.com/service_market"
+                },
+                {
+                    "type": "view",
+                    "name": "闲置共享",
+                    "url": "http://fsyjq.roswellcsy.com/share"
+                }
+            ]
+        }
+    ]
+}

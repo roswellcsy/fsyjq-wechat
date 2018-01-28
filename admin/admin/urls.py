@@ -14,11 +14,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
+from rest_framework import routers
+from app import views
 from django.contrib import admin
+
+router = routers.DefaultRouter()
+router.register(r'tokens', views.TokenViewSet)
+
+# router = routers.DefaultRouter()
+# router.register(r'api', views.ApiViewSet)
 
 urlpatterns = [
     # url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
     # url(r'^demo/', include('demo.urls')),
-    url(r'^app/', include('app.urls')),
+    # url(r'^wechatapi/', include('wechatapi.urls'))
     url(r'^admin/', admin.site.urls),
+    url(r'^app/', include('app.urls')),
+    url(r'^api/v1.0', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

@@ -14,14 +14,16 @@ class User(models.Model):
     class Meta:
         verbose_name_plural = '用户信息'
     # 微信可获取的信息
+    # 是否关注公众号
+    subscribe = models.CharField(max_length=1,default='1')
     # 记录关注者的微信号ID
     openid = models.CharField(max_length=255)
     # 昵称
     nickname = models.CharField(max_length=50, verbose_name='昵称')
     # 姓名
-    name = models.CharField(max_length=50, verbose_name='姓名', blank=True)
+    name = models.CharField(max_length=50, verbose_name='姓名', blank=True, null=True)
     # 手机号
-    cellphone = models.CharField(max_length=11, verbose_name='手机号', blank=True)
+    cellphone = models.CharField(max_length=11, verbose_name='手机号', blank=True, null=True)
     # 性别,值为1时是男性，值为2时是女性，值为0时是未知
     SEX = (
         ('1', '男'),
@@ -29,29 +31,30 @@ class User(models.Model):
     )
     user_sex = models.CharField(max_length=1, choices=SEX, verbose_name='性别')
     # 城市
-    user_city = models.CharField(max_length=10, blank=True, verbose_name='城市')
+    user_city = models.CharField(max_length=10, blank=True, verbose_name='城市', null=True)
     # 国家
     user_country = models.CharField(
-        max_length=10, blank=True, verbose_name='国家')
+        max_length=10, blank=True, verbose_name='国家', null=True)
     # 省份
     user_province = models.CharField(
-        max_length=10, blank=True, verbose_name='省份')
+        max_length=10, blank=True, verbose_name='省份', null=True)
     # 语言，简体中文为zh_CN
     user_language = models.CharField(
         max_length=10, default='zh_CN', verbose_name='语言')
     # 关注时间
-    user_subscribe_time = models.DateTimeField(
-        max_length=100, null=True, blank=True, verbose_name='关注公众号时间')
+    user_subscribe_time = models.CharField(max_length=10, null=True, blank=True, verbose_name='关注公众号时间')
     # 网页访问access_token
     user_access_token = models.CharField(max_length=255)
-    # access_token获得时间
-    user_access_time = models.DateTimeField(blank=True,null=True)
+    # access_token过期时间
+    user_access_time = models.CharField(max_length=10, blank=True, null=True)
     # 网页访问refresh_token
     user_refresh_token = models.CharField(max_length=255)
-    # refresh_token获得时间
-    user_refresh_time = models.DateTimeField(blank=True,null=True)
-    #是否志愿者
-    user_volunteer_or_not = models.BooleanField(default=False,verbose_name='是否志愿者')
+    # refresh_token过期时间
+    user_refresh_time = models.CharField(max_length=10, blank=True, null=True)
+    # 是否志愿者
+    user_volunteer_or_not = models.BooleanField(
+        default=False, verbose_name='是否志愿者')
+
     def is_volunteer(self):
         if self.user_volunteer_or_not == False:
             return '否'
@@ -64,6 +67,20 @@ class User(models.Model):
     # def signup_campaign(self):
     #     return ','.join([i.campaign_name for i in self.charitycampaign_set.all()])
     # signup_campaign.short_description = '报名活动清单'
+
+# 单个图片上传
+
+
+class SingleUploadImg(models.Model):
+    def __str__(self):
+        return self.photo_name
+
+    class Meta:
+        verbose_name_plural = '单图片上传'
+    campaign_or_service_name = models.CharField(
+        max_length=50, verbose_name='活动名称')
+    photo_name = models.CharField(max_length=10, verbose_name='照片名字')
+    photo = models.ImageField('图片', upload_to='media')
 
 
 class CharityCampaign(models.Model):
@@ -100,6 +117,9 @@ class CharityCampaign(models.Model):
     campaign_content = models.CharField(max_length=255, verbose_name='活动内容')
     # 服务费用
     campaign_paid = models.CharField(max_length=50, verbose_name='服务费用')
+    # 活动图片
+    photos = models.ManyToManyField(
+        SingleUploadImg, blank=True, verbose_name='活动图片')
     # 报名截止日期
     campaign_signup_deadline = models.DateTimeField('报名截止时间')
     # 联系方式
@@ -111,14 +131,14 @@ class CharityCampaign(models.Model):
         User, blank=True, verbose_name='报名人员名单')
 
     def user_list(self):
-        return ','.join(['姓名:'+i.name+',联系方式:'+i.cellphone for i in self.signup_user_list.all()])
+        return ','.join(['姓名:' + i.name + ',联系方式:' + i.cellphone for i in self.signup_user_list.all()])
     user_list.short_description = '报名人员名单'
     # campaign_members = models.ManyToManyField(
     #     User,
     #     through='CharityCampaignSignUp',
     #     through_fields=('CharityCampaign','User'),
     # )
-
+    # 需要加上上传图片，多图片前端使用vux的swiper自动轮播，参考祖庙微服务
 
 # class CharityCampaignSignUp(models.Model):
 #     # 公益活动报名
@@ -145,7 +165,12 @@ class ProServ(models.Model):
 
     def __str__(self):
         return self.sw_name + self.case_id
+    # 初始信息
+    proserv_question_title = models.CharField(
+        max_length=255, verbose_name='咨询问题')
 
+    proserv_question_content = models.CharField(
+        max_length=255, verbose_name='咨询内容')
     # 个案服务登记表内容
     # 服务中心信息
     # 社工姓名
@@ -154,25 +179,26 @@ class ProServ(models.Model):
     case_id = models.CharField(max_length=50, verbose_name='个案编号')
     # 咨询日期
     counseling_date = models.DateField('咨询日期')
+    # 咨询对象信息
     # (1)姓名
-    # proserv_name = models.CharField(
-    #     max_length=20, verbose_name='姓名')
-    def proserv_name(self):
-        return self.proserv_user.name
-    proserv_name.short_description = '姓名'
+    proserv_name = models.CharField(
+        max_length=20, verbose_name='姓名')
+    # def proserv_name(self):
+    #     return self.proserv_user.name
+    # proserv_name.short_description = '姓名'
     # (2)性别
-    # SEX = (
-    #     ('1', '男'),
-    #     ('2', '女'),
-    # )
-    # proserv_sex = models.CharField(
-    #     max_length=1, choices=SEX, verbose_name='性别')
-    def proserv_sex(self):
-        if self.proserv_user.user_sex == '1':
-            return '男'
-        elif self.proserv_user.user_sex == '2':
-            return '女'
-    proserv_sex.short_description='性别'
+    SEX = (
+        ('1', '男'),
+        ('2', '女'),
+    )
+    proserv_sex = models.CharField(
+        max_length=1, choices=SEX, verbose_name='性别')
+    # def proserv_sex(self):
+    #     if self.proserv_user.user_sex == '1':
+    #         return '男'
+    #     elif self.proserv_user.user_sex == '2':
+    #         return '女'
+    # proserv_sex.short_description='性别'
     # (3)年龄
     proserv_age = models.CharField(
         max_length=20, blank=True, verbose_name='年龄')
@@ -207,11 +233,11 @@ class ProServ(models.Model):
     proserv_community = models.CharField(
         max_length=50, blank=True, verbose_name='所在社区')
     # (14)联系方式
-    # proserv_contact = models.CharField(
-    #     max_length=50, blank=True, verbose_name='联系方式')
-    def proserv_contact(self):
-        return self.proserv_user.cellphone
-    proserv_contact.short_description = '联系方式'
+    proserv_contact = models.CharField(
+        max_length=50, blank=True, verbose_name='联系方式')
+    # def proserv_contact(self):
+    #     return self.proserv_user.cellphone
+    # proserv_contact.short_description = '联系方式'
     # (15)家庭住址
     proserv_live_address = models.CharField(
         max_length=50, blank=True, verbose_name='家庭住址')
@@ -245,7 +271,7 @@ class ProServ(models.Model):
         ('14', '其它'),
     )
     proserv_counseling = models.CharField(
-        max_length=50, choices=question_type, blank=True, verbose_name='咨询问题')
+        max_length=50, choices=question_type, blank=True, verbose_name='咨询问题类型')
     assistance_type = (
         ('1', '医疗救助'),
         ('2', '教育救助'),
@@ -272,7 +298,7 @@ class VolunteerInfo(models.Model):
     def __str__(self):
         return self.volinfo_user.name
     # 志愿者信息
-    volinfo_user = models.ForeignKey(User,verbose_name='微信用户')
+    volinfo_user = models.ForeignKey(User, verbose_name='微信用户')
     #(1)姓名
     volinfo_name = models.CharField(max_length=20, verbose_name='姓名')
     # def volinfo_name(self):
@@ -294,7 +320,7 @@ class VolunteerInfo(models.Model):
     # volinfo_sex.short_description = '性别'
     volinfo_age = models.CharField(
         max_length=2, blank=True, verbose_name='年龄')
-        
+
     #(3)籍贯
     volinfo_jiguan = models.CharField(
         max_length=100, blank=True, verbose_name='籍贯')
@@ -406,7 +432,7 @@ class VolServ(models.Model):
         VolunteerInfo, blank=True, verbose_name='报名志愿者名单')
 
     def user_list(self):
-        return ','.join(['姓名:'+i.volinfo_name + ',联系方式:' + i.volinfo_cell_number for i in self.signup_user_list.all()])
+        return ','.join(['姓名:' + i.volinfo_name + ',联系方式:' + i.volinfo_cell_number for i in self.signup_user_list.all()])
     user_list.short_description = '报名志愿者名单'
 
 
@@ -436,9 +462,8 @@ class VolTraining(models.Model):
         VolunteerInfo, blank=True, verbose_name='报名志愿者名单')
 
     def user_list(self):
-        return ','.join(['姓名:'+i.volinfo_name + ',联系方式:' + i.volinfo_cell_number for i in self.signup_user_list.all()])
+        return ','.join(['姓名:' + i.volinfo_name + ',联系方式:' + i.volinfo_cell_number for i in self.signup_user_list.all()])
     user_list.short_description = '报名志愿者名单'
-
 
 
 class PolicyQA(models.Model):
@@ -447,7 +472,17 @@ class PolicyQA(models.Model):
     qa_title = models.CharField(max_length=255, verbose_name='标题')
     qa_content = models.CharField(max_length=255, verbose_name='内容')
     qa_answer = models.CharField(max_length=255, verbose_name='回答')
-    qa_ask_date = models.DateTimeField(verbose_name='提问时间',null=True,blank=True)
-    qa_answer_date = models.DateTimeField(verbose_name='提问时间',null=True,blank=True)
-    qa_user = models.ForeignKey(User, verbose_name='微信用户',blank=True)
+    qa_ask_date = models.DateTimeField(
+        verbose_name='提问时间', null=True, blank=True)
+    qa_answer_date = models.DateTimeField(
+        verbose_name='提问时间', null=True, blank=True)
+    qa_user = models.ForeignKey(User, verbose_name='微信用户', blank=True)
     # def user(self):
+
+
+# 微信API相关
+class AccessToken(models.Model):
+    class Meta:
+        verbose_name_plural = '核心token'
+    access_token = models.CharField(max_length=255)
+    expire_in = models.IntegerField()

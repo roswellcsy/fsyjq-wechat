@@ -25,7 +25,7 @@ SECRET_KEY = '$sdn&)*yus3ws8)v$uo!5bu)r-nz@8mvh@!oex1#(m-xyz4=xk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fsyjq.roswellcsy.com','localhost']
 
 
 # Application definition
@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # 'demo.apps.DemoConfig',
     'app.apps.AppConfig',
+    # 'wechatapi.apps.WechatapiConfig'
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -41,6 +42,9 @@ INSTALLED_APPS = [
     # 'grappelli.dashboard',
     # 'grappelli',
     'django.contrib.admin',
+    'rest_framework',
+    # 'django_mysql',
+    # 'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -78,16 +82,26 @@ WSGI_APPLICATION = 'admin.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'fsyjq-test',
+    #     'USER': 'fsyjq',
+    #     'PASSWORD': 'SLSG@20171019',
+    #     'HOST': 'rm-wz9ec4kz5ildi1t96o.mysql.rds.aliyuncs.com',
+    #     'PORT': '3306',
+    #     'OPTIONS': {
+    #         'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+    #     }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fsyjq-test',
-        'USER': 'fsyjq',
-        'PASSWORD': 'SLSG@20171019',
-        'HOST': 'rm-wz9ec4kz5ildi1t96o.mysql.rds.aliyuncs.com',
-        'PORT': '3306',
+        'NAME': 'fsyjq',
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        }
+            'charset': 'utf8mb4',
+        },
+        'USER': 'root',
+        'PASSWORD': 'P@ssw0rd',
+        'HOST': 'localhost',
+        'PORT': '3306'
     }
 }
 
@@ -132,3 +146,16 @@ USE_L10N = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Media files(jpg)
+MEDIA_URL = '/media/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# restful framework settings
+
+REST_FRAMEWORK = {  
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'PAGINATE_BY': 10
+}

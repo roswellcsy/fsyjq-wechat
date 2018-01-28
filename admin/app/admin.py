@@ -1,12 +1,12 @@
 from django.contrib import admin
-from .models import User, VolunteerInfo, CharityCampaign, ProServ, VolServ, VolTraining, PolicyQA
+from .models import User, SingleUploadImg, VolunteerInfo, CharityCampaign, ProServ, VolServ, VolTraining, PolicyQA
 # Register your models here.
 
 
 class UserAdmin(admin.ModelAdmin):
-    # readonly_fields = ['user_subscribe_time', 'nickname', 'user_city',
-    #                    'user_country', 'user_province', 'user_language',
-    #                    'user_subscribe_time']
+    readonly_fields = ['user_subscribe_time', 'nickname', 'user_city','user_sex',
+                       'user_country', 'user_province', 'user_language',
+                       'user_subscribe_time','user_volunteer_or_not']
     fieldsets = [
         ('个人信息', {'fields': ['nickname', 'name', 'cellphone', 'user_sex', 'user_city',
                              'user_country', 'user_province', 'user_language',
@@ -33,7 +33,7 @@ class CharityCampaignAdmin(admin.ModelAdmin):
     fieldsets = [
         ('活动信息', {'fields': ['campaign_name', 'campaign_type', 'campaign_date', 'campaign_client', 'campaign_address',
                              'campaign_content', 'campaign_paid', 'campaign_signup_deadline',
-                             'campaign_contact', 'campaign_counts']}),
+                             'campaign_contact', 'campaign_counts','photos']}),
         ('报名人选', {'fields': ['signup_user_list']}),
         # ('活动清单', {'fields': ('signup_user_list',)}),
         # ('访问信息', {'fields': readonly_fields})
@@ -53,13 +53,13 @@ class ProServAdmin(admin.ModelAdmin):
     readonly_fields = []
     fieldsets = [
         ('负责方信息', {'fields': ['sw_name', 'case_id', 'counseling_date']}),
-        ('客户信息', {'fields': ['proserv_age', 'proserv_jiguan',
+        ('初始信息',{'fields':['proserv_counseling','proserv_question_title','proserv_question_content']}),
+        ('客户信息', {'fields': ['proserv_name','proserv_sex','proserv_contact','proserv_age', 'proserv_jiguan',
                              'proserv_house_hold', 'proserv_id_num', 'proserv_ethnic', 'proserv_political_status',
                              'proserv_religion', 'proserv_occupation', 'proserv_studying_grade', 'proserv_degree_of_education',
                              'proserv_community', 'proserv_live_address', 'proserv_married',
                              ]}),
-        ('服务信息', {'fields': ['proserv_counseling',
-                             'social_assistance', 'counseling_results']})
+        ('服务信息', {'fields': ['social_assistance', 'counseling_results']})
         # ('活动清单', {'fields': ('signup_user_list',)}),
         # ('访问信息', {'fields': readonly_fields})
         # ('访问信息',{'fields': ['user_access_token', 'user_access_time', 'user_refresh_token', 'user_refresh_time']}),
@@ -146,3 +146,5 @@ class PolicyQAAdmin(admin.ModelAdmin):
 
 
 admin.site.register(PolicyQA, PolicyQAAdmin)
+
+admin.site.register(SingleUploadImg)
